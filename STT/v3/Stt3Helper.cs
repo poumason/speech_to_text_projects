@@ -9,6 +9,8 @@ namespace mp3WavConverter.stt.v3
 {
     public class Stt3Helper
     {
+        const int DEFAULT_CHANNEL = 0;
+
         public static void ParseContentV3(string outFolder, string[] jsonFiles)
         {
             foreach (var fileItem in jsonFiles)
@@ -18,7 +20,7 @@ namespace mp3WavConverter.stt.v3
                 var result = JsonConvert.DeserializeObject<Stt3Result>(content);
 
                 var transcriptObject = new Transcript();
-                transcriptObject.full_text = result.combinedRecognizedPhrases.Length > 2 ? result.combinedRecognizedPhrases[1].display : result.combinedRecognizedPhrases.First().display;
+                transcriptObject.full_text = result.combinedRecognizedPhrases.Where(x => x.channel == DEFAULT_CHANNEL).FirstOrDefault().display;
 
                 // only maxest Confidence
                 foreach (var segment in result.recognizedPhrases)
@@ -26,12 +28,14 @@ namespace mp3WavConverter.stt.v3
                     segment.nBest = new Nbest[] { segment.nBest.OrderByDescending(x => x.confidence).First() };
                 }
 
+                var recognizedPhrases = result.recognizedPhrases.Where(x => x.channel == DEFAULT_CHANNEL).ToList();
+
                 const string endSymbol = "。";
                 Regex matchRegex = new Regex(@"\，|\。");
 
                 VTT vttData = new VTT();
 
-                foreach (var segment in result.recognizedPhrases)
+                foreach (var segment in recognizedPhrases)
                 {
                     var nBest = segment.nBest.First();
 

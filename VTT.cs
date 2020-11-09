@@ -22,7 +22,7 @@ namespace mp3WavConverter
 
             foreach (var item in Cues)
             {
-                builder.AppendLine(item.ToVTTFormat());
+                builder.Append(item.ToVTTFormat());
             }
 
             return builder.ToString();
@@ -34,7 +34,7 @@ namespace mp3WavConverter
 
             foreach (var item in Cues)
             {
-                builder.AppendLine(item.ToLRCFormat());
+                builder.Append(item.ToLRCFormat());
             }
 
             return builder.ToString();
