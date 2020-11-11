@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Net.Mime;
 using System.Text;
 
 namespace mp3WavConverter
@@ -38,6 +40,27 @@ namespace mp3WavConverter
             }
 
             return builder.ToString();
+        }
+
+        public string ToLyrics()
+        {
+            var lyricsData = new LyricsData
+            {
+                composer = "test",
+                lyricist = "test",
+                nick = "test",
+                creator = "creator",
+                lyrics = new List<LyricsItem>()
+            };
+
+            foreach (var item in Cues)
+            {
+                lyricsData.lyrics.AddRange(item.ToLyricsItems());
+            }
+
+            var json = JsonConvert.SerializeObject(lyricsData);
+
+            return json;
         }
     }
 
@@ -85,5 +108,51 @@ namespace mp3WavConverter
 
             return builder.ToString();
         }
+
+        public List<LyricsItem> ToLyricsItems()
+        {
+            List<LyricsItem> items = new List<LyricsItem>();
+            var startAt = TimeSpan.FromMilliseconds(StartAtMS);
+            var endAt = TimeSpan.FromMilliseconds(EndAtMS);
+
+            Comments.ForEach(x =>
+            {
+                var lyrics = new LyricsItem
+                {
+                    content = x,
+                    start_time = (int)startAt.TotalMilliseconds,
+                    end_time = (int)endAt.TotalMilliseconds,
+                };
+                items.Add(lyrics);
+            });
+
+            return items;
+        }
+    }
+
+    public class LyricsData
+    {
+        public string composer { get; set; }
+
+        public string creator { get; set; }
+
+        public string lyricist { get; set; }
+
+        public List<LyricsItem> lyrics { get; set; }
+
+        public string nick { get; set; }
+    }
+
+    public class LyricsItem
+    {
+        public string content { get; set; }
+
+        public int type { get; set; } = 0;
+
+        public int start_time { get; set; }
+
+        public int end_time { get; set; }
+
+        public bool is_session_start { get; set; } = false;
     }
 }
