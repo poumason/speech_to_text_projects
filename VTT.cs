@@ -62,6 +62,20 @@ namespace mp3WavConverter
 
             return json;
         }
+
+        public string ToSimpleTranscript()
+        {
+            var simple = new SimpleTranscriptData();
+
+            foreach (var item in Cues)
+            {
+                simple.transcripts.AddRange(item.ToSimpleTranscriptItem());
+            }
+
+            var json = JsonConvert.SerializeObject(simple);
+
+            return json;
+        }
     }
 
     public class VTTItem
@@ -128,6 +142,26 @@ namespace mp3WavConverter
 
             return items;
         }
+
+        public List<SimpleTranscriptItem> ToSimpleTranscriptItem()
+        {
+            List<SimpleTranscriptItem> items = new List<SimpleTranscriptItem>();
+            var startAt = TimeSpan.FromMilliseconds(StartAtMS);
+            var endAt = TimeSpan.FromMilliseconds(EndAtMS);
+
+            Comments.ForEach(x =>
+            {
+                var simpleItem = new SimpleTranscriptItem
+                {
+                    content = x,
+                    start_at_ms = (int)startAt.TotalMilliseconds,
+                    end_at_ms = (int)endAt.TotalMilliseconds,
+                };
+                items.Add(simpleItem);
+            });
+
+            return items;
+        }
     }
 
     public class LyricsData
@@ -154,5 +188,22 @@ namespace mp3WavConverter
         public int end_time { get; set; }
 
         public bool is_session_start { get; set; } = false;
+    }
+
+    public class SimpleTranscriptData
+    {
+        public List<SimpleTranscriptItem> transcripts { get; set; }
+
+        public SimpleTranscriptData()
+        {
+            transcripts = new List<SimpleTranscriptItem>();
+        }
+    }
+
+    public class SimpleTranscriptItem
+    {
+        public string content { get; set; }
+        public int start_at_ms { get; set; }
+        public int end_at_ms { get; set; }
     }
 }

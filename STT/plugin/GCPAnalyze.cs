@@ -49,5 +49,43 @@ namespace mp3WavConverter.STT.plugin
 
             File.WriteAllText(newScoreFile, builder.ToString());
         }
+
+        //static void InvokeGCPSTTService(string outFolder)
+        //{
+        //    var speech = SpeechClient.Create();
+        //    var longOperation = speech.LongRunningRecognize(new LongRunningRecognizeRequest()
+        //    {
+        //        Config = new RecognitionConfig
+        //        {
+        //            Encoding = RecognitionConfig.Types.AudioEncoding.Flac,
+        //            SampleRateHertz = 44100,
+        //            AudioChannelCount = 2,
+        //            LanguageCode = "zh-TW",
+        //            EnableWordTimeOffsets = true
+        //        },
+        //        Audio = new RecognitionAudio
+        //        {
+        //            Uri = ""
+        //        }
+        //    });
+
+        //    StringBuilder builder = new StringBuilder();
+
+        //    longOperation = longOperation.PollUntilCompleted();
+        //    var response = longOperation.Result;
+        //    foreach (var result in response.Results)
+        //    {
+        //        foreach (var alternative in result.Alternatives)
+        //        {
+        //            Debug.WriteLine($"Transcript: { alternative.Transcript}");
+        //            builder.AppendLine(alternative.Transcript);
+        //        }
+        //    }
+
+        //    var testFileName = $"gcp.txt";
+        //    var testFile = Path.Combine(outFolder, testFileName);
+        //    File.WriteAllText(testFile, builder.ToString());
+        //    Console.WriteLine($"test GCP file: {testFileName}");
+        //}
     }
 }

@@ -133,6 +133,11 @@ namespace mp3WavConverter.stt.v3
                 var lyricsNewFile = Path.Combine(outFolder, lyrcisFileName);
                 File.WriteAllText(lyricsNewFile, vttData.ToLyrics());
                 Console.WriteLine($"lyrics file: {lrcFileName}");
+
+                var transcriptFileName = $"{Path.GetFileNameWithoutExtension(fileItem)}.trans";
+                var transcriptNewFile = Path.Combine(outFolder, transcriptFileName);
+                File.WriteAllText(lyricsNewFile, vttData.ToSimpleTranscript());
+                Console.WriteLine($"simple transcript file: {lrcFileName}");
             }
         }
 
