@@ -1,6 +1,4 @@
-﻿using Google.Apis.Auth.OAuth2;
-using Google.Cloud.Language.V1;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,10 +16,6 @@ namespace mp3WavConverter.stt.v3
 
         public static void ParseContentV3(string outFolder, string[] jsonFiles)
         {
-            LanguageServiceClient client = LanguageServiceClient.Create();
-
-            Dictionary<string, int> score = new Dictionary<string, int>();
-
             foreach (var fileItem in jsonFiles)
             {
                 var content = File.ReadAllText(fileItem);
@@ -88,24 +82,8 @@ namespace mp3WavConverter.stt.v3
                             }
                         }
                     }
-                    // 4. google text analysis
-                    var response = client.AnalyzeEntities(Document.FromPlainText(rawContent, "zh-Hant"));
-                    Debug.WriteLine($"Detected language: {response.Language}");
-                    Debug.WriteLine("Detected entities:");
-                    foreach (Entity entity in response.Entities)
-                    {
-                        var key = $"{entity.Name}_{entity.Type}";
-                        var exist = score.Keys.Where(x => x == key).FirstOrDefault();
-                        if (exist == null)
-                        {
-                            score.Add(key, 1);
-                        }else
-                        {
-                            score[key] += 1;
-                        }
 
-                        Debug.WriteLine($"  {entity.Name} (type: {entity.Type})({(int)(entity.Salience * 100)}%)");
-                    }
+                    //// 4. google text analysis
 
                     // 3. when the VTT item is lasted, but end_at is empty, must feeding it.
                     if (tempVttItem != null && tempVttItem.EndAtMS == 0)
@@ -132,20 +110,6 @@ namespace mp3WavConverter.stt.v3
                     transcriptObject.sentences.Add(sentence);
                 }
 
-
-                StringBuilder builder = new StringBuilder();
-
-                foreach (var item in score.OrderByDescending(x=>x.Value))
-                {
-                    string[] format = item.Key.Split('_');
-                    Debug.WriteLine($"{format[0]} , {format[1]}, count: {item.Value}");
-                    builder.AppendLine($"{format[0]} , {format[1]}, count: {item.Value}");
-                }
-                var scoreFile = $"{Path.GetFileNameWithoutExtension(fileItem)}.score";
-                var newScoreFile = Path.Combine(outFolder, scoreFile);
-
-                File.WriteAllText(newScoreFile, builder.ToString());
-
                 var outputJson = JsonConvert.SerializeObject(transcriptObject);
 
                 var fileName = Path.GetFileName(fileItem);
@@ -169,6 +133,11 @@ namespace mp3WavConverter.stt.v3
                 var lyricsNewFile = Path.Combine(outFolder, lyrcisFileName);
                 File.WriteAllText(lyricsNewFile, vttData.ToLyrics());
                 Console.WriteLine($"lyrics file: {lrcFileName}");
+
+                var transcriptFileName = $"{Path.GetFileNameWithoutExtension(fileItem)}.trans";
+                var transcriptNewFile = Path.Combine(outFolder, transcriptFileName);
+                File.WriteAllText(lyricsNewFile, vttData.ToSimpleTranscript());
+                Console.WriteLine($"simple transcript file: {lrcFileName}");
             }
         }
 
