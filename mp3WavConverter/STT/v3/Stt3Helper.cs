@@ -12,7 +12,7 @@ namespace mp3WavConverter.stt.v3
 {
     public class Stt3Helper
     {
-        const int DEFAULT_CHANNEL = 0;
+        const int DEFAULT_CHANNEL = 1;
 
         public static void ParseContentV3(string outFolder, string[] jsonFiles)
         {
@@ -136,8 +136,8 @@ namespace mp3WavConverter.stt.v3
 
                 var transcriptFileName = $"{Path.GetFileNameWithoutExtension(fileItem)}.trans";
                 var transcriptNewFile = Path.Combine(outFolder, transcriptFileName);
-                File.WriteAllText(lyricsNewFile, vttData.ToSimpleTranscript());
-                Console.WriteLine($"simple transcript file: {lrcFileName}");
+                File.WriteAllText(transcriptNewFile, vttData.ToSimpleTranscript());
+                Console.WriteLine($"simple transcript file: {transcriptFileName}");
             }
         }
 
