@@ -13,9 +13,40 @@ namespace transcript_cli
             app.Name = "aitrans";
             app.HelpOption("-?|-h|--help");
 
-            app.OnExecute(() => {
+            app.OnExecute(() =>
+            {
                 Console.WriteLine("Hello World!");
                 return 0;
+            });
+
+            app.Command("subscription", (command) =>
+            {
+                command.Description = "Set Your Subscription Key and Your Service Region";
+                command.HelpOption("-?|-h|--help");
+                var keyOpt = command.Option("-k|--key <subscription-key>",
+                                       "Your Subscription Key",
+                                       CommandOptionType.SingleValue);
+                var regionOpt = command.Option("-r|--region <service-region>",
+                                       "Your Service Region",
+                                       CommandOptionType.SingleValue);
+
+                command.OnExecute(() =>
+                {
+                    const string AZURE_SUBSCRIPTION_KEY = "azure-subscription-key";
+                    const string AZURE_SERVICE_REGION = "azure-service-region";
+
+                    string subscriptionKey = keyOpt.Value();
+                    string serviceRegion = regionOpt.Value();
+
+                    Environment.SetEnvironmentVariable(AZURE_SUBSCRIPTION_KEY, subscriptionKey);
+                    Environment.SetEnvironmentVariable(AZURE_SERVICE_REGION, serviceRegion);
+
+                    Console.WriteLine($"before: {Environment.GetEnvironmentVariable(AZURE_SUBSCRIPTION_KEY)}, {Environment.GetEnvironmentVariable(AZURE_SERVICE_REGION)}");
+                    Console.WriteLine($"after: {Environment.GetEnvironmentVariable(AZURE_SUBSCRIPTION_KEY)}, {Environment.GetEnvironmentVariable(AZURE_SERVICE_REGION)}");
+
+                    return 0;
+                });
+
             });
 
             app.Command("hide", (command) =>
